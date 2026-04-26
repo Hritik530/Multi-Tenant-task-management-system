@@ -1,0 +1,145 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Organizations (Tenants)
+model Organization {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  users     User[]
+  tasks     Task[]
+  auditLogs AuditLog[]
+}
+
+// Users with role-based access
+model User {
+  id             String   @id @default(uuid())
+  name           String
+  email          String   @unique
+  passwordHash   String?
+  role           UserRole @default(MEMBER)
+  organizationId String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // OAuth fields (optional)
+  provider          String?
+  providerUserId    String?
+
+  // Relations
+  organization      Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  tasksCreated       Task[]            @relation("CreatedBy")
+  tasksAssigned      Task[]            @relation("AssignedTo")
+  auditLogs          AuditLog[]
+  refreshTokens      RefreshToken[]
+
+  // Index for performance
+  @@index([organizationId])
+  @@index([email])
+}
+
+enum UserRole {
+  ADMIN
+  MEMBER
+}
+
+// Tasks
+model Task {
+  id             String      @id @default(uuid())
+  title          String
+  description    String?
+  status         TaskStatus  @default(TODO)
+  priority       TaskPriority @default(MEDIUM)
+  assignedTo     String?
+  createdBy      String
+  organizationId String
+  dueDate        DateTime?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  assignedToUser User?        @relation("AssignedTo", fields: [assignedTo], references: [id])
+  createdByUser  User         @relation("CreatedBy", fields: [createdBy], references: [id])
+  auditLogs      AuditLog[]
+
+  // Indexes for performance
+  @@index([organizationId])
+  @@index([createdBy])
+  @@index([assignedTo])
+  @@index([status])
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+// Audit Logs for tracking changes
+model AuditLog {
+  id             String   @id @default(uuid())
+  actionType     String
+  taskId         String
+  performedBy   String
+  organizationId String
+  oldValue       Json?
+  newValue       Json?
+  createdAt      DateTime @default(now())
+
+  // Relations
+  task           Task        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  performedByUser User       @relation(fields: [performedBy], references: [id])
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // Indexes
+  @@index([organizationId])
+  @@index([taskId])
+  @@index([performedBy])
+}
+
+// Refresh Tokens for JWT refresh mechanism
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Index
+  @@index([userId])
+  @@index([token])
+}
+
+// Blacklisted tokens for logout
+model BlacklistedToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  // Index
+  @@index([token])
+  @@index([expiresAt])
+}

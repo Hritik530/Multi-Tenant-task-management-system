@@ -1,0 +1,42 @@
+{
+  "name": "multi-tenant-task-management",
+  "version": "1.0.0",
+  "description": "Production-grade multi-tenant task management system",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "migrate": "npx prisma migrate dev",
+    "migrate:prod": "npx prisma migrate deploy",
+    "generate": "npx prisma generate",
+    "test": "jest --coverage",
+    "docker:build": "docker build -t multi-tenant-task-app .",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.10.0",
+    "bcryptjs": "2.4.3",
+    "cors": "2.8.5",
+    "dotenv": "16.4.5",
+    "express": "4.18.3",
+    "express-rate-limit": "7.1.5",
+    "helmet": "7.1.0",
+    "ioredis": "5.3.2",
+    "joi": "17.12.2",
+    "jsonwebtoken": "9.0.2",
+    "passport": "0.7.0",
+    "passport-google-oauth20": "2.0.0",
+    "uuid": "9.0.1",
+    "winston": "3.11.0"
+  },
+  "devDependencies": {
+    "jest": "29.7.0",
+    "nodemon": "3.1.0",
+    "prisma": "^5.10.0",
+    "supertest": "6.3.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
