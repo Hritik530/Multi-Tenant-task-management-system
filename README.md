@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-# Multi-Tenant-task-management-system
-A production-grade multi-tenant task management web application (similar to Trello/Asana) where multiple organizations can use the same system simultaneously while keeping their data completely isolated from each other.
-=======
+
 # Multi-Tenant Task Management System
 
 A production-grade multi-tenant task management web application (similar to Trello/Asana) where multiple organizations can use the same system simultaneously while keeping their data completely isolated from each other.
