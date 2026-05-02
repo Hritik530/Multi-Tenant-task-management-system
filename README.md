@@ -287,16 +287,6 @@ Query Filter: { organizationId: req.user.organizationId }
 Database (isolated data)
 ```
 
-## Audit Logs
-
-### Action Types
-
-- `TASK_CREATED` - New task created
-- `TASK_UPDATED` - Task details updated
-- `TASK_DELETED` - Task deleted
-- `TASK_ASSIGNED` - Task reassigned
-- `STATUS_CHANGED` - Task status changed
-
 ### Log Structure
 
 ```json
